@@ -1,0 +1,27 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://our.company.com/jobUpdate.schema.json",
+	"type": "object",
+	"properties": {
+		"user_id": {
+			"type": "string",
+			"minLength": 1,
+			"maxLength": 30
+		},
+		"imdb_id": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"viewed": {
+			"type": "boolean"
+		},
+		"created_at": {
+			"type": "integer"
+		},
+		"updated_at": {
+			"type": "string"
+		}
+	},
+	"additionalProperties": false,
+	"required": [ "user_id", "imdb_id", "viewed", "created_at" ]
+}

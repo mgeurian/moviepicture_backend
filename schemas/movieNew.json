@@ -1,0 +1,51 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://example.com/example.json",
+	"type": "object",
+	"examples": [
+		{
+			"imdb_id": "tt0076759",
+			"title": "Star Wars",
+			"year": "1977",
+			"genre": "Action, Adventure, Fantasy",
+			"plot": "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a Wookiee and two droids to save the galaxy from the Empire's world-destroying battle station, while also attempting to rescue Princess Leia from the mysterious Darth Vader",
+			"director": "George Lucas",
+			"poster": "https://m.media-amazon.com/images/M/MV5BNzVlY2MwMjktM2E4OS00Y2Y3LWE3ZjctYzhkZGM3YzA1ZWM2XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg",
+			"imdb_rating": 8.6
+		}
+	],
+	"properties": {
+		"imdb_id": {
+			"type": "string"
+		},
+		"title": {
+			"type": "string",
+			"minLength": 1
+		},
+		"year": {
+			"type": "integer",
+			"minLength": 1,
+			"maxLength": 4
+		},
+		"genre": {
+			"type": "string",
+			"minLength": 1
+		},
+		"plot": {
+			"type": "string",
+			"minLength": 1
+		},
+		"director": {
+			"type": "string",
+			"minLength": 1
+		},
+		"poster": {
+			"type": "string"
+		},
+		"imdb_rating": {
+			"type": "number"
+		}
+	},
+	"additionalProperties": false,
+	"required": [ "imdb_id", "title" ]
+}
