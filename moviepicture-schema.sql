@@ -1,34 +1,36 @@
-CREATE TABLE movie_list (
-  handle VARCHAR(25) PRIMARY KEY CHECK (handle = lower(handle)),
-  name TEXT UNIQUE NOT NULL,
-  num_employees INTEGER CHECK (num_employees >= 0),
-  description TEXT NOT NULL,
-  logo_url TEXT
-);
-
 CREATE TABLE users (
-  username VARCHAR(25) PRIMARY KEY,
-  password TEXT NOT NULL,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  email TEXT NOT NULL
-    CHECK (position('@' IN email) > 1),
-  is_admin BOOLEAN NOT NULL DEFAULT FALSE
-);
-
-CREATE TABLE jobs (
   id SERIAL PRIMARY KEY,
-  title TEXT NOT NULL,
-  salary INTEGER CHECK (salary >= 0),
-  equity NUMERIC CHECK (equity <= 1.0),
-  company_handle VARCHAR(25) NOT NULL
-    REFERENCES companies ON DELETE CASCADE
+  password TEXT NOT NULL,
+  first_name VARCHAR(30) NOT NULL,
+  last_name VARCHAR(30) NOT NULL,
+  email TEXT NOT NULL,
+  is_public BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE applications (
-  username VARCHAR(25)
-    REFERENCES users ON DELETE CASCADE,
-  job_id INTEGER
-    REFERENCES jobs ON DELETE CASCADE,
-  PRIMARY KEY (username, job_id)
+CREATE TABLE movie (
+  id SERIAL PRIMARY KEY,
+  imdb_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  year VARCHAR(4),
+  genre TEXT,
+  plot TEXT, 
+  director TEXT,
+  poster TEXT,
+  imdb_rating VARCHAR(4),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE user_movie (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER,
+  movie_id INTEGER,
+  viewed BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_movie FOREIGN KEY(movie_id) REFERENCES movie(id) ON DELETE CASCADE
+);
+
