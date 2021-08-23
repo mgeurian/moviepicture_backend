@@ -17,6 +17,8 @@ function getDatabaseUri() {
 // Speed up bcrypt during tests, since the algorithm safety isn't being tested
 const BCRYPT_WORK_FACTOR = process.env.NODE_ENV === 'test' ? 1 : 12;
 
+const omdbApiKey = process.env.OMDB_API_KEY || '964e3a1b';
+
 console.log('moviepicture Config:'.green);
 console.log('SECRET_KEY:'.yellow, SECRET_KEY);
 console.log('PORT:'.yellow, PORT.toString());
@@ -28,5 +30,6 @@ module.exports = {
 	SECRET_KEY,
 	PORT,
 	BCRYPT_WORK_FACTOR,
-	getDatabaseUri
+	getDatabaseUri,
+	omdbApiKey
 };
