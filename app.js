@@ -22,8 +22,8 @@ app.use(morgan('tiny'));
 app.use(authenticateJWT);
 
 app.use('/auth', authRoutes);
-app.use('/users', usersRoutes);
-app.use('/movies', moviesRoutes);
+app.use('/user', usersRoutes);
+app.use('/movie', moviesRoutes);
 
 /** Handle 404 errors -- this matches everything */
 app.use(function(req, res, next) {
