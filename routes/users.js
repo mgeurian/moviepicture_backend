@@ -107,6 +107,7 @@ router.get('/:userId/movies/:type', ensureLoggedIn, async (req, res, next) => {
 		const { userId, type = 'all' } = req.params;
 		const { page = 1 } = req.query;
 		const { id: loggedInUserId } = res.locals.user;
+		console.log(`userid: ${userId}, type: ${type}, page:${page}`);
 
 		const user = await User.get(userId);
 
@@ -150,10 +151,11 @@ router.patch('/:id/movie/:userMovieId/update', ensureCorrectUser, async (req, re
 	}
 });
 
-router.delete('/:id/movie/:userMovieId', ensureCorrectUser, async (req, res, next) => {
-	const { id: userId, userMovieId } = req.params;
+router.delete('/:id/movie/:movieId', ensureCorrectUser, async (req, res, next) => {
+	const { id: userId, movieId } = req.params;
+	console.log('from users.js router.delete model:', userId, movieId);
 	try {
-		const result = await UserMovie.deleteUserMovie({ userMovieId, userId });
+		const result = await UserMovie.deleteUserMovie({ movieId, userId });
 		return res.json({ data: result });
 	} catch (err) {
 		return next(err);

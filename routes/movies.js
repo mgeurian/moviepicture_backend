@@ -13,19 +13,24 @@ const OmdbWrapper = require('../helpers/omdb');
 
 const router = express.Router();
 
+/** GET /[searchTerm] => { movies }
+ *
+ * Returns { Poster, Title, Type, Year, imdbID }
+ *
+ *  **/
 router.get('/search', ensureLoggedIn, async (req, res, next) => {
-    try {
-        const validator = jsonschema.validate(req.query, movieSearchSchema);
-        if (!validator.valid) {
-            const errs = validator.errors.map((e) => e.stack);
-            throw new BadRequestError(errs);
-        }
+	try {
+		const validator = jsonschema.validate(req.query, movieSearchSchema);
+		if (!validator.valid) {
+			const errs = validator.errors.map((e) => e.stack);
+			throw new BadRequestError(errs);
+		}
 
-        const data = await OmdbWrapper.searchMoviesByTitle(req.query.q);
-        return res.json({ data });
-    } catch (err) {
-        return next(err);
-    }
+		const data = await OmdbWrapper.searchMoviesByTitle(req.query.q);
+		return res.json({ data });
+	} catch (err) {
+		return next(err);
+	}
 });
 
 /** GET /[movie_id] => { movie }
@@ -34,19 +39,19 @@ router.get('/search', ensureLoggedIn, async (req, res, next) => {
  *
  *  **/
 
-router.get('/:id', ensureLoggedIn, async function (req, res, next) {
-    try {
-        const { id } = req.params;
-        const movie = await Movie.getById(id);
+router.get('/:id', ensureLoggedIn, async function(req, res, next) {
+	try {
+		const { id } = req.params;
+		const movie = await Movie.getById(id);
 
-        if (!movie) {
-            throw new NotFoundError(`Movie with id ${ id } not found`);
-        }
+		if (!movie) {
+			throw new NotFoundError(`Movie with id ${id} not found`);
+		}
 
-        return res.json({ data: movie });
-    } catch (err) {
-        return next(err);
-    }
+		return res.json({ data: movie });
+	} catch (err) {
+		return next(err);
+	}
 });
 
 module.exports = router;

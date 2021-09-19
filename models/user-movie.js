@@ -7,66 +7,66 @@ const { sqlForPartialUpdate } = require('../helpers/sql');
 /** Related functions for a user's movies. */
 
 class UserMovie {
-    static viewTypeProperties = {
-        all: 'true OR false',
-        viewed: 'true',
-        notViewed: 'false'
-    }
+	static viewTypeProperties = {
+		all: `TRUE OR FALSE`,
+		viewed: `TRUE`,
+		notViewed: `FALSE`
+	};
 
-    static async getByUserIdAndMovieId(userId, movieId) {
-        const movieRes = await db.query(
-            `SELECT *
+	static async getByUserIdAndMovieId(userId, movieId) {
+		const movieRes = await db.query(
+			`SELECT *
             FROM user_movie
             WHERE user_id = $1 AND movie_id = $2`,
-            [userId, movieId]
-        );
+			[ userId, movieId ]
+		);
 
-        const [userMovie] = movieRes.rows;
-        return userMovie;
-    }
+		const [ userMovie ] = movieRes.rows;
+		return userMovie;
+	}
 
-    static async addMovieToUserList(data) {
-        const { userId, movieId, viewed } = data;
+	static async addMovieToUserList(data) {
+		const { userId, movieId, viewed } = data;
 
-        const result = await db.query(
-            `INSERT INTO user_movie
+		const result = await db.query(
+			`INSERT INTO user_movie
             (user_id,
             movie_id,
             viewed)
             VALUES ($1, $2, $3)
             RETURNING id, user_id, movie_id, viewed`,
-            [userId, movieId, viewed]
-        );
+			[ userId, movieId, viewed ]
+		);
 
-        const [userMovie] = result.rows;
+		const [ userMovie ] = result.rows;
 
-        return userMovie;
-    }
+		return userMovie;
+	}
 
-    static async getUserMovies(id, page, type) {
-        const offset = (page - 1) * 20;
+	static async getUserMovies(id, page, type) {
+		const offset = (page - 1) * 10;
 
-        const result = await db.query(
-            `SELECT um.id, um.movie_id, um.viewed, m.title, m.poster, m.imdb_id
+		const result = await db.query(
+			`SELECT um.id, um.movie_id, um.viewed, m.title, m.poster, m.imdb_id
             FROM user_movie um
             INNER JOIN movie m ON um.movie_id = m.id
-            WHERE um.user_id = $1 AND um.viewed IS ${ UserMovie.viewTypeProperties[type] }
+            WHERE um.user_id = $1 AND um.viewed IS ${UserMovie.viewTypeProperties[type]}
             ORDER BY title ASC
-            LIMIT 20 OFFSET $2`,
-            [id, offset]
-        );
+            LIMIT 10 OFFSET $2`,
+			[ id, offset ]
+		);
 
-        const userMovies = result.rows;
+		const userMovies = result.rows;
 
-        return userMovies;
-    }
+		return userMovies;
+	}
 
-    // queries other user's list, but let's me know which of their movies is also in my list
-    static async getMappedMovieList(userId, loggedInUserId, page, type) {
-        const offset = (page - 1) * 20;
+	// queries other user's list, but let's me know which of their movies is also in my list
+	static async getMappedMovieList(userId, loggedInUserId, page, type) {
+		const offset = (page - 1) * 20;
 
-        const result = await db.query(
-            `SELECT um.id, um.movie_id, um.viewed, m.title, m.poster, m.imdb_id,
+		const result = await db.query(
+			`SELECT um.id, um.movie_id, um.viewed, m.title, m.poster, m.imdb_id,
             CASE
 	            WHEN COUNT(um.id) = 2 THEN true
 	            WHEN COUNT(um.id) = 1 THEN false
@@ -79,44 +79,48 @@ class UserMovie {
         ) sub
         ON um.movie_id = sub.movie_id
         INNER JOIN movie m ON um.movie_id = m.id
-        WHERE um.user_id = $1 AND um.viewed IS ${ UserMovie.viewTypeProperties[type] }
+        WHERE um.user_id = $1 AND um.viewed IS ${UserMovie.viewTypeProperties[type]}
         GROUP BY um.id, um.movie_id, um.viewed, m.title, m.poster, m.imdb_id
         ORDER BY m.title ASC
         LIMIT 20 OFFSET $3`,
-            [userId, loggedInUserId, offset]
-        );
+			[ userId, loggedInUserId, offset ]
+		);
 
-        return result.rows;
-    }
+		return result.rows;
+	}
 
-    static async updateUserMovie({ userMovieId, viewed, userId }) {
-        const result = await db.query(`
+	static async updateUserMovie({ userMovieId, viewed, userId }) {
+		const result = await db.query(
+			`
             UPDATE user_movie
             SET viewed = $1, updated_at = CURRENT_TIMESTAMP
             WHERE id = $2 AND user_id = $3
             RETURNING id, user_id, movie_id, viewed, created_at, updated_at
-        `, [viewed, userMovieId, userId]);
+        `,
+			[ viewed, userMovieId, userId ]
+		);
 
-        const [userMovie] = result.rows;
+		const [ userMovie ] = result.rows;
 
-        if (!userMovie) {
-            throw new NotFoundError(`UserMovie id ${ userMovieId } not found`);
-        }
+		if (!userMovie) {
+			throw new NotFoundError(`UserMovie id ${userMovieId} not found`);
+		}
 
-        return userMovie;
-    }
+		return userMovie;
+	}
 
-    static async deleteUserMovie({ userMovieId, userId }) {
-        const result = await db.query(`
-            DELETE FROM user_movie
-            WHERE id = $1 AND user_id = $2`, [userMovieId, userId]);
+	static async deleteUserMovie({ movieId, userId }) {
+		const result = await db.query(`DELETE FROM user_movie WHERE movie_id = $1 AND user_id = $2`, [
+			movieId,
+			userId
+		]);
 
-        if (result.rowCount === 0) {
-            throw new NotFoundError(`UserMovie id ${ userMovieId } not found`);
-        }
+		if (result.rowCount === 0) {
+			throw new NotFoundError(`UserMovie id ${movieId} not found`);
+		}
 
-        return { success: true };
-    }
+		return { success: true };
+	}
 }
 
 module.exports = UserMovie;
