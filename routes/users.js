@@ -102,12 +102,41 @@ router.post('/:id/movie/:imdbId/add', ensureCorrectUser, async (req, res, next) 
 	}
 });
 
+// router.get('/:userId/movies/:type', ensureLoggedIn, async (req, res, next) => {
+// 	try {
+// 		const { userId, type } = req.params;
+// 		const { page = 1 } = req.query;
+// 		const { id: loggedInUserId } = res.locals.user;
+// 		console.log(`userid: ${userId}, type: ${type}, page:${page}`);
+
+// 		const user = await User.get(userId);
+
+// 		if (loggedInUserId != userId && !user.is_public) {
+// 			throw new UnauthorizedError('Cannot view private movie list');
+// 		}
+
+// 		/**
+//          * If querying another user's public list, use this complicated query.
+//          * It indicates whether each of their movies is also included on logged in user's list.
+//          */
+// 		if (loggedInUserId != userId) {
+// 			const movies = await UserMovie.getMappedMovieList(userId, loggedInUserId, page, type);
+// 			return res.json({ data: movies });
+// 		}
+
+// 		// Otherwise use this easier query for my list of movies
+// 		const movies = await UserMovie.getUserMovies(userId, page, type);
+// 		return res.json({ data: movies });
+// 	} catch (err) {
+// 		return next(err);
+// 	}
+// });
+
 router.get('/:userId/movies/:type', ensureLoggedIn, async (req, res, next) => {
 	try {
-		const { userId, type = 'all' } = req.params;
-		const { page = 1 } = req.query;
+		const { userId, type } = req.params;
+		const { page } = req.query;
 		const { id: loggedInUserId } = res.locals.user;
-		console.log(`userid: ${userId}, type: ${type}, page:${page}`);
 
 		const user = await User.get(userId);
 
@@ -115,18 +144,22 @@ router.get('/:userId/movies/:type', ensureLoggedIn, async (req, res, next) => {
 			throw new UnauthorizedError('Cannot view private movie list');
 		}
 
+		// get total number of movies to help frontend with pagination
+		const numMovies = await UserMovie.getTotalNumberOfMovies(userId);
+
 		/**
          * If querying another user's public list, use this complicated query.
          * It indicates whether each of their movies is also included on logged in user's list.
          */
 		if (loggedInUserId != userId) {
 			const movies = await UserMovie.getMappedMovieList(userId, loggedInUserId, page, type);
-			return res.json({ data: movies });
+			return res.json({ Search: movies, totalResults: numMovies });
 		}
 
 		// Otherwise use this easier query for my list of movies
 		const movies = await UserMovie.getUserMovies(userId, page, type);
-		return res.json({ data: movies });
+
+		return res.json({ Search: movies, totalResults: numMovies });
 	} catch (err) {
 		return next(err);
 	}
@@ -153,7 +186,6 @@ router.patch('/:id/movie/:userMovieId/update', ensureCorrectUser, async (req, re
 
 router.delete('/:id/movie/:movieId', ensureCorrectUser, async (req, res, next) => {
 	const { id: userId, movieId } = req.params;
-	console.log('from users.js router.delete model:', userId, movieId);
 	try {
 		const result = await UserMovie.deleteUserMovie({ movieId, userId });
 		return res.json({ data: result });

@@ -61,6 +61,13 @@ class UserMovie {
 		return userMovies;
 	}
 
+	static async getTotalNumberOfMovies(id) {
+		const result = await db.query(`SELECT COUNT(*) FROM user_movie WHERE user_id = $1`, [ id ]);
+
+		const numOfUserMovies = result.rows[0];
+		return numOfUserMovies;
+	}
+
 	// queries other user's list, but let's me know which of their movies is also in my list
 	static async getMappedMovieList(userId, loggedInUserId, page, type) {
 		const offset = (page - 1) * 20;
