@@ -146,7 +146,6 @@ router.get('/:userId/movies/:type', ensureLoggedIn, async (req, res, next) => {
 
 		// get total number of movies to help frontend with pagination
 		const numMovies = await UserMovie.getTotalNumberOfMovies(userId);
-
 		/**
          * If querying another user's public list, use this complicated query.
          * It indicates whether each of their movies is also included on logged in user's list.
@@ -158,7 +157,6 @@ router.get('/:userId/movies/:type', ensureLoggedIn, async (req, res, next) => {
 
 		// Otherwise use this easier query for my list of movies
 		const movies = await UserMovie.getUserMovies(userId, page, type);
-
 		return res.json({ Search: movies, totalResults: numMovies });
 	} catch (err) {
 		return next(err);
