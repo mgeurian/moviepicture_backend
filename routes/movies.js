@@ -54,4 +54,20 @@ router.get('/:id', ensureLoggedIn, async function(req, res, next) {
 	}
 });
 
+router.get('/id/:id', ensureLoggedIn, async function(req, res, next) {
+	try {
+		const { id } = req.params;
+
+		const movie = await OmdbWrapper.getMovieByImdbId(id);
+
+		if (!movie) {
+			throw new NotFoundError(`Movie with imdbID ${id} not found`);
+		}
+
+		return res.json({ data: movie });
+	} catch (err) {
+		return next(err);
+	}
+});
+
 module.exports = router;
