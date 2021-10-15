@@ -9,6 +9,7 @@ const { ensureLoggedIn } = require('../middleware/auth');
 const movieSearchSchema = require('../schemas/movieSearch.json');
 const { BadRequestError, NotFoundError } = require('../expressError');
 const Movie = require('../models/movie');
+const UserMovie = require('../models/user-movie');
 const OmdbWrapper = require('../helpers/omdb');
 
 const router = express.Router();
@@ -54,17 +55,39 @@ router.get('/:id', ensureLoggedIn, async function(req, res, next) {
 	}
 });
 
+/** GET /[imdb_id] => { movie }
+ *
+ * Returns { Title, Year, Rated, Released, Runtime, Genre, Director, Writer, Actors, Plot Language, Country Awards, Poster, Ratings[], Metascore
+ * imdbRating, imdbVotes, imdbID, Type, DVD, BoxOffice, Production, Website, Response }
+ *
+ *  **/
+
 router.get('/id/:id', ensureLoggedIn, async function(req, res, next) {
 	try {
 		const { id } = req.params;
 
+		const { userId } = req.body;
+
+		console.log(req.body);
+
+		console.log(`this is the userId: ${userId}`);
+
+		const viewed = UserMovie.getViewedByImdbId(userId, id);
+		console.log('this is viewed from movies routes: ', viewed);
+		if (!viewed) {
+			throw new BadRequestError(`Something went wrong.`);
+		}
 		const movie = await OmdbWrapper.getMovieByImdbId(id);
 
 		if (!movie) {
 			throw new NotFoundError(`Movie with imdbID ${id} not found`);
 		}
 
-		return res.json({ data: movie });
+		return res.json({ data: movie, viewedData: viewed });
+
+		// return res.json({ Search: movies, totalResults: numMovies });
+
+		// return res.json({ data: movie });
 	} catch (err) {
 		return next(err);
 	}

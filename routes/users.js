@@ -62,6 +62,7 @@ router.patch('/:id/account', ensureCorrectUser, async function(req, res, next) {
 	}
 });
 
+// Add a movie to a user's list
 router.post('/:id/movie/:imdbId/add', ensureCorrectUser, async (req, res, next) => {
 	const { imdbId, id } = req.params;
 	const { viewed = true } = req.body;
@@ -102,36 +103,7 @@ router.post('/:id/movie/:imdbId/add', ensureCorrectUser, async (req, res, next) 
 	}
 });
 
-// router.get('/:userId/movies/:type', ensureLoggedIn, async (req, res, next) => {
-// 	try {
-// 		const { userId, type } = req.params;
-// 		const { page = 1 } = req.query;
-// 		const { id: loggedInUserId } = res.locals.user;
-// 		console.log(`userid: ${userId}, type: ${type}, page:${page}`);
-
-// 		const user = await User.get(userId);
-
-// 		if (loggedInUserId != userId && !user.is_public) {
-// 			throw new UnauthorizedError('Cannot view private movie list');
-// 		}
-
-// 		/**
-//          * If querying another user's public list, use this complicated query.
-//          * It indicates whether each of their movies is also included on logged in user's list.
-//          */
-// 		if (loggedInUserId != userId) {
-// 			const movies = await UserMovie.getMappedMovieList(userId, loggedInUserId, page, type);
-// 			return res.json({ data: movies });
-// 		}
-
-// 		// Otherwise use this easier query for my list of movies
-// 		const movies = await UserMovie.getUserMovies(userId, page, type);
-// 		return res.json({ data: movies });
-// 	} catch (err) {
-// 		return next(err);
-// 	}
-// });
-
+// Get a list of user's movies
 router.get('/:userId/movies/:type', ensureLoggedIn, async (req, res, next) => {
 	try {
 		const { userId, type } = req.params;
@@ -203,5 +175,7 @@ router.get('/search', ensureLoggedIn, async (req, res, next) => {
 		return next(err);
 	}
 });
+
+// router.get('/:id/movie/')
 
 module.exports = router;

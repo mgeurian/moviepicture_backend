@@ -10,104 +10,100 @@ const { BCRYPT_WORK_FACTOR } = require('../config.js');
 /** Related functions for users. */
 
 class User {
-    /** authenticate user with email, password.
+	/** authenticate user with email, password.
    *
    * Returns { username, first_name, last_name, email }
    *
    * Throws UnauthorizedError is user not found or wrong password.
    **/
 
-    static async authenticate(email, password) {
-        // try to find the user first
-        const result = await db.query(
-            `SELECT id,
-			  password,
-              first_name,
-              last_name,
-              email
-          FROM users
-          WHERE email = $1`,
-            [email.toLowerCase()]
-        );
+	static async authenticate(email, password) {
+		// try to find the user first
+		const result = await db.query(
+			`SELECT id, password, first_name, last_name, email
+            FROM users
+            WHERE email = $1`,
+			[ email.toLowerCase() ]
+		);
 
-        const user = result.rows[0];
+		const user = result.rows[0];
 
-        if (user) {
-            // compare hashed password to a new hash from password
-            const isValid = await bcrypt.compare(password, user.password);
-            if (isValid === true) {
-                delete user.password;
-                return user;
-            }
-        }
+		if (user) {
+			// compare hashed password to a new hash from password
+			const isValid = await bcrypt.compare(password, user.password);
+			if (isValid === true) {
+				delete user.password;
+				return user;
+			}
+		}
 
-        throw new UnauthorizedError('Invalid email/password');
-    }
+		throw new UnauthorizedError('Invalid email/password');
+	}
 
-    /** Register user with data.
+	/** Register user with data.
    *
    * Returns { username, firstName, lastName, email }
    *
    * Throws BadRequestError on duplicates.
    **/
 
-    static async register({ password, first_name, last_name, email }) {
-        const duplicateCheck = await db.query(
-            `SELECT email
+	static async register({ password, first_name, last_name, email }) {
+		const duplicateCheck = await db.query(
+			`SELECT email
             FROM users
             WHERE email = $1`,
-            [email.toLowerCase()]
-        );
+			[ email.toLowerCase() ]
+		);
 
-        if (duplicateCheck.rows[0]) {
-            throw new BadRequestError(`Duplicate email: ${ email }`);
-        }
+		if (duplicateCheck.rows[0]) {
+			throw new BadRequestError(`Duplicate email: ${email}`);
+		}
 
-        const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
+		const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
-        const result = await db.query(
-            `INSERT INTO users
+		const result = await db.query(
+			`INSERT INTO users
             (password,
             first_name,
             last_name,
             email)
             VALUES ($1, $2, $3, $4)
             RETURNING first_name, last_name, email, id`,
-            [hashedPassword, first_name, last_name, email.toLowerCase()]
-        );
+			[ hashedPassword, first_name, last_name, email.toLowerCase() ]
+		);
 
-        const user = result.rows[0];
+		const user = result.rows[0];
 
-        return user;
-    }
+		return user;
+	}
 
-    /** Given an email, return data about user.
+	/** Given an email, return data about user.
    *
    * Returns { email, first_name, last_name }
    *
    * Throws NotFoundError if user not found.
    **/
 
-    static async get(id) {
-        const userRes = await db.query(
-            `SELECT id,
+	static async get(id) {
+		const userRes = await db.query(
+			`SELECT id,
 			  email,
               first_name,
               last_name,
               is_public
             FROM users
             WHERE id = $1`,
-            [id]
-        );
+			[ id ]
+		);
 
-        const user = userRes.rows[0];
+		const user = userRes.rows[0];
 
-        if (!user) throw new NotFoundError(`No user: ${ id }`);
+		if (!user) throw new NotFoundError(`No user: ${id}`);
 
-        return user;
-    }
+		return user;
+	}
 
-    /** Update user data with `data`.
+	/** Update user data with `data`.
    *
    * This is a "partial update" --- it's fine if data doesn't contain
    * all the fields; this only changes provided ones.
@@ -124,20 +120,20 @@ class User {
    * or a serious security risks are opened.
    */
 
-    static async update(id, data) {
-        if (data.password) {
-            data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
-        }
+	static async update(id, data) {
+		if (data.password) {
+			data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
+		}
 
-        const { setCols, values } = sqlForPartialUpdate(data, {
-            firstName: 'first_name',
-            lastName: 'last_name'
-        });
-        const idVarIdx = '$' + (values.length + 1);
+		const { setCols, values } = sqlForPartialUpdate(data, {
+			firstName: 'first_name',
+			lastName: 'last_name'
+		});
+		const idVarIdx = '$' + (values.length + 1);
 
-        const querySql = `UPDATE users 
-                      SET ${ setCols }, updated_at = CURRENT_TIMESTAMP
-                      WHERE id = ${ idVarIdx } 
+		const querySql = `UPDATE users 
+                      SET ${setCols}, updated_at = CURRENT_TIMESTAMP
+                      WHERE id = ${idVarIdx} 
                       RETURNING id,
 								first_name,
                                 last_name,
@@ -145,48 +141,48 @@ class User {
                                 is_public,
                                 created_at,
                                 updated_at`;
-        const result = await db.query(querySql, [...values, id]);
-        const user = result.rows[0];
+		const result = await db.query(querySql, [ ...values, id ]);
+		const user = result.rows[0];
 
-        if (!user) throw new NotFoundError(`No user: ${ id }`);
+		if (!user) throw new NotFoundError(`No user: ${id}`);
 
-        delete user.password;
-        return user;
-    }
+		delete user.password;
+		return user;
+	}
 
-    /** Delete given user from database; returns undefined. */
+	/** Delete given user from database; returns undefined. */
 
-    static async remove(id) {
-        let result = await db.query(
-            `DELETE
+	static async remove(id) {
+		let result = await db.query(
+			`DELETE
             FROM users
             WHERE id = $1
             RETURNING email`,
-            [id]
-        );
-        const user = result.rows[0];
+			[ id ]
+		);
+		const user = result.rows[0];
 
-        if (!user) throw new NotFoundError(`No user: ${ id }`);
-    }
+		if (!user) throw new NotFoundError(`No user: ${id}`);
+	}
 
-    static async getPublicUserByEmail(userEmail) {
-        const userRes = await db.query(
-            `SELECT id,
+	static async getPublicUserByEmail(userEmail) {
+		const userRes = await db.query(
+			`SELECT id,
 			  email,
               first_name,
               last_name,
               is_public
             FROM users
             WHERE email = $1 AND is_public IS true`,
-            [userEmail]
-        );
+			[ userEmail ]
+		);
 
-        const user = userRes.rows[0];
+		const user = userRes.rows[0];
 
-        if (!user) throw new NotFoundError(`No user: ${ email }`);
+		if (!user) throw new NotFoundError(`No user: ${email}`);
 
-        return user;
-    }
+		return user;
+	}
 }
 
 module.exports = User;
