@@ -68,12 +68,12 @@ router.get('/id/:id', ensureLoggedIn, async function(req, res, next) {
 
 		const { userId } = req.body;
 
-		console.log(req.body);
-
 		console.log(`this is the userId: ${userId}`);
 
-		const viewed = UserMovie.getViewedByImdbId(userId, id);
+		const viewed = await UserMovie.getViewedByImdbId(userId, id);
+
 		console.log('this is viewed from movies routes: ', viewed);
+
 		if (!viewed) {
 			throw new BadRequestError(`Something went wrong.`);
 		}
@@ -84,10 +84,6 @@ router.get('/id/:id', ensureLoggedIn, async function(req, res, next) {
 		}
 
 		return res.json({ data: movie, viewedData: viewed });
-
-		// return res.json({ Search: movies, totalResults: numMovies });
-
-		// return res.json({ data: movie });
 	} catch (err) {
 		return next(err);
 	}
