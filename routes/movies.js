@@ -65,25 +65,30 @@ router.get('/:id', ensureLoggedIn, async function(req, res, next) {
 router.get('/id/:id', ensureLoggedIn, async function(req, res, next) {
 	try {
 		const { id } = req.params;
-
 		const { userId } = req.body;
+		console.log('from movies routes ln 69: ', userId);
 
-		console.log(`this is the userId: ${userId}`);
-
+		//get IMDB_id and search user's list (by userId) for a specific movie wth id of (id)
 		const viewed = await UserMovie.getViewedByImdbId(userId, id);
 
-		console.log('this is viewed from movies routes: ', viewed);
+		let viewedResults = viewed;
 
-		if (!viewed) {
-			throw new BadRequestError(`Something went wrong.`);
+		// if there are no results, the movie is not in the user's list.
+		// return the imdb_id and set viewed to false to show the user has not seen the movie.
+		if (!viewedResults) {
+			viewedResults = {
+				imdb_id: id,
+				viewed: false
+			};
 		}
+
 		const movie = await OmdbWrapper.getMovieByImdbId(id);
 
 		if (!movie) {
 			throw new NotFoundError(`Movie with imdbID ${id} not found`);
 		}
 
-		return res.json({ data: movie, viewedData: viewed });
+		return res.json({ data: movie, viewedResults: viewedResults });
 	} catch (err) {
 		return next(err);
 	}
