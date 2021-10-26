@@ -65,11 +65,11 @@ router.get('/:id', ensureLoggedIn, async function(req, res, next) {
 router.get('/id/:id', ensureLoggedIn, async function(req, res, next) {
 	try {
 		const { id } = req.params;
-		const { userId } = req.body;
-		console.log('from movies routes ln 69: ', userId);
+		const { user_id } = req.query;
+		console.log('from movies routes ln 69: ', user_id);
 
 		//get IMDB_id and search user's list (by userId) for a specific movie wth id of (id)
-		const viewed = await UserMovie.getViewedByImdbId(userId, id);
+		const viewed = await UserMovie.getViewedByImdbId(user_id, id);
 
 		let viewedResults = viewed;
 
