@@ -168,7 +168,7 @@ class User {
 	static async getPublicUserByEmail(userEmail) {
 		const userRes = await db.query(
 			`SELECT id,
-			  email,
+			  			email,
               first_name,
               last_name,
               is_public
