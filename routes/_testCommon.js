@@ -6,9 +6,9 @@ const db = require('../db');
 const User = require('../models/user');
 const Movie = require('../models/movie');
 const UserMovie = require('../models/user-movie');
-const { createToken } = require('../helpers/tokens');
 const { omdbWrapper } = require('../helpers/omdb');
-const { disable } = require('../app');
+
+const testMovieIds = [];
 
 async function commonBeforeAll() {
 	// noInspection SqlWithoutWhere
@@ -50,12 +50,18 @@ async function commonAfterAll() {
 	await db.end();
 }
 
-const user1Token = createToken({ email: 'u1@example.com', password: 'password' });
+// async function getUser() {
+// 	const result = await db.query(`SELECT id FROM user WHERE email = $1`, ['u1@example.com']);
+// 	const [user] = result.rows;
+// }
+
+// async function getMovie() {
+// 	movie1 = await db.query(`SELECT * FROM movie WHERE imdbId = tt3420504`);
+// }
 
 module.exports = {
 	commonBeforeAll,
 	commonBeforeEach,
 	commonAfterEach,
-	commonAfterAll,
-	user1Token
+	commonAfterAll
 };
