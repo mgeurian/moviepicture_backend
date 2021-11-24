@@ -37,7 +37,12 @@ afterAll(commonAfterAll);
 
 // /************************************** GET /search */
 
-// describe('GET /search', function() {});
+describe('GET /search', function() {
+	test('works for user', async function() {
+		const res = await request(app).get(`/movie/search`).set('authorization', `Bearer ${user1Token}`);
+		expect;
+	});
+});
 
 // /************************************** GET /:id */
 
