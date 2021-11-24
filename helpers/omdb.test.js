@@ -60,3 +60,55 @@ it('searches movies by title', async () => {
 
 	expect(data.Search[0].Title).toEqual(title);
 });
+
+it('gets movies by ImdbId', async () => {
+	axios.get.mockResolvedValue({
+		data: {
+			Title: 'Cruella',
+			Year: '2021',
+			Rated: 'PG-13',
+			Released: '28 May 2021',
+			Runtime: '134 min',
+			Genre: 'Adventure, Comedy, Crime',
+			Director: 'Craig Gillespie',
+			Writer: 'Dana Fox, Tony McNamara, Aline Brosh McKenna',
+			Actors: 'Emma Stone, Emma Thompson, Joel Fry',
+			Plot: 'A live-action prequel feature film following a young Cruella de Vil.',
+			Language: 'English, French',
+			Country: 'United States, United Kingdom',
+			Awards: '1 win & 5 nominations',
+			Poster:
+				'https://m.media-amazon.com/images/M/MV5BOWI5YTUxOWEtZmRiZS00ZmQxLWE2NzctYTRiODA2NzE1ZjczXkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_SX300.jpg',
+			Ratings: [
+				{
+					Source: 'Internet Movie Database',
+					Value: '7.4/10'
+				},
+				{
+					Source: 'Rotten Tomatoes',
+					Value: '74%'
+				},
+				{
+					Source: 'Metacritic',
+					Value: '59/100'
+				}
+			],
+			Metascore: '59',
+			imdbRating: '7.4',
+			imdbVotes: '185,717',
+			imdbID: 'tt3228774',
+			Type: 'movie',
+			DVD: '27 Aug 2021',
+			BoxOffice: '$86,103,234',
+			Production: 'N/A',
+			Website: 'N/A',
+			Response: 'True'
+		}
+	});
+
+	const imdbId = 'tt3228774';
+	const title = 'Cruella';
+	const data = await OmdbWrapper.getMovieByImdbId(imdbId);
+
+	expect(data.Title).toEqual(title);
+});
