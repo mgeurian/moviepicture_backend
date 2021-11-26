@@ -5,10 +5,6 @@ process.env.NODE_ENV = 'test';
 const db = require('../db');
 const User = require('../models/user');
 const Movie = require('../models/movie');
-const UserMovie = require('../models/user-movie');
-const { omdbWrapper } = require('../helpers/omdb');
-
-const testMovieIds = [];
 
 async function commonBeforeAll() {
 	// noInspection SqlWithoutWhere

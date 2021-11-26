@@ -3,12 +3,19 @@
 const db = require('../db.js');
 const { BadRequestError, NotFoundError } = require('../expressError');
 const Movie = require('./movie');
-const { commonBeforeAll, commonBeforeEach, commonAfterEach, commonAfterAll } = require('./_testCommon');
+const {
+	commonBeforeAll,
+	commonBeforeEach,
+	commonAfterEach,
+	commonAfterAll,
+	testUserIds,
+	testMovieIds
+} = require('./_testCommon');
 
-// beforeAll(commonBeforeAll);
-// beforeEach(commonBeforeEach);
-// afterEach(commonAfterEach);
-// afterAll(commonAfterAll);
+beforeAll(commonBeforeAll);
+beforeEach(commonBeforeEach);
+afterEach(commonAfterEach);
+afterAll(commonAfterAll);
 
 /************************************** create */
 
