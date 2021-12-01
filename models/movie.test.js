@@ -1,16 +1,8 @@
 'use strict';
 
 const db = require('../db.js');
-const { BadRequestError, NotFoundError } = require('../expressError');
-const Movie = require('./movie');
-const {
-	commonBeforeAll,
-	commonBeforeEach,
-	commonAfterEach,
-	commonAfterAll,
-	testUserIds,
-	testMovieIds
-} = require('./_testCommon');
+const Movie = require('./user-movie');
+const { commonBeforeAll, commonBeforeEach, commonAfterEach, commonAfterAll, testMovieIds } = require('./_testCommon');
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -34,29 +26,29 @@ describe('create', function() {
 	};
 
 	test('create new movie works', async function() {
-		let movie = await Movie.create(newMovie);
-		expect(movie).toEqual(newMovie);
+		await Movie.create(newMovie);
 
 		const result = await db.query(
 			`SELECT imdb_id, title, year, genre, plot, director, poster, imdb_rating FROM movie WHERE imdb_id = 'tt3420504'`
 		);
-		expect(result.rows).toEqual([
-			{
-				imdb_id: 'tt3420504',
-				title: 'Finch',
-				year: 2021,
-				genre: 'Drama, Sci-Fi',
-				plot:
-					"On a post-apocalyptic earth, a robot, built to protect the life of his creator's beloved dog, learns about life, love, friendship and what it means to be human.",
-				director: 'Miguel Sapochnik',
-				poster:
-					'https://m.media-amazon.com/images/M/MV5BMmExZDc4NjEtZjY1ZS00OWU5LWExZGYtYTc4NDM1ZmRhMDZhXkEyXkFqcGdeQXVyMTEyMjM2NDc2._V1_SX300.jpg',
-				imdb_rating: 7.0
-			}
-		]);
+		expect(result.rows[0].title).toEqual('Finch');
 	});
 });
 
-/************************************** getAll */
+/************************************** getByImdbId */
 
-// describe
+describe('get', function() {
+	test('works', async function() {
+		let movie = await Movie.getByImdbId('tt0076759');
+		expect(movie.title).toEqual('Star Wars');
+	});
+});
+
+/************************************** getById */
+
+describe('get', function() {
+	test('works', async function() {
+		let movie = await Movie.getById(testMovieIds[0]);
+		expect(movie.title).toEqual('Star Wars');
+	});
+});

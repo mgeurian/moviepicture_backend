@@ -12,10 +12,11 @@ async function commonBeforeAll() {
 	// noinspection SqlWithoutWhere
 	await db.query('DELETE FROM users');
 
-	// const resultsMovies = await db.query(`
-	//       INSERT INTO movie (imdb_id, title, year, genre, plot, director, poster, imdb_rating)
-	//       VALUES ('tt0076759', 'Star Wars', 1977, 'Action, Adventure, Fantasy', "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a Wookiee and two droids to save the galaxy from the Empire's world-destroying battle station, while also attempting to rescue Princess Leia from the mysterious Darth Vad", 'George Lucas', 'https://m.media-amazon.com/images/M/MV5BNzVlY2MwMjktM2E4OS00Y2Y3LWE3ZjctYzhkZGM3YzA1ZWM2XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg', 8.6)`);
-	// testMovieIds.splice(0, 0, ...resultsMovies.rows.map((r) => r.id));
+	const resultsMovies = await db.query(`
+	      INSERT INTO movie (imdb_id, title, year, genre, plot, director, poster, imdb_rating)
+	      VALUES ('tt0076759', 'Star Wars', 1977, 'Action, Adventure, Fantasy', 'Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a Wookiee and two droids to save the galaxy from the Empires world-destroying battle station, while also attempting to rescue Princess Leia from the mysterious Darth Vad', 'George Lucas', 'https://m.media-amazon.com/images/M/MV5BNzVlY2MwMjktM2E4OS00Y2Y3LWE3ZjctYzhkZGM3YzA1ZWM2XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg', 8.6)
+				RETURNING id`);
+	testMovieIds.splice(0, 0, ...resultsMovies.rows.map((r) => r.id));
 
 	const resultsUsers = await db.query(
 		`
@@ -30,12 +31,12 @@ async function commonBeforeAll() {
 	);
 	testUserIds.splice(0, 0, ...resultsUsers.rows.map((r) => r.id));
 
-	// await db.query(
-	// 	`
-	//       INSERT INTO user_movie (user_id, movie_id, viewed)
-	//       VALUES ($1, $2, TRUE)`,
-	// 	[ testUserIds[0], testMovieIds[0] ]
-	// );
+	await db.query(
+		`
+	      INSERT INTO user_movie (user_id, movie_id, viewed)
+	      VALUES ($1, $2, TRUE)`,
+		[ testUserIds[0], testMovieIds[0] ]
+	);
 }
 
 async function commonBeforeEach() {
@@ -55,6 +56,6 @@ module.exports = {
 	commonBeforeEach,
 	commonAfterEach,
 	commonAfterAll,
-	// testMovieIds,
+	testMovieIds,
 	testUserIds
 };
