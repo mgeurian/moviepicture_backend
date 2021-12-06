@@ -71,6 +71,7 @@ router.get('/id/:id', ensureLoggedIn, async function(req, res, next) {
 		const viewed = await UserMovie.getViewedByImdbId(user_id, id);
 
 		let viewedResults = viewed;
+		console.log('these are the viewedResults: ', viewedResults);
 
 		// if there are no results, the movie is not in the user's list.
 		// return the imdb_id and set viewed to false to show the user has not seen the movie.

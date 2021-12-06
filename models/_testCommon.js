@@ -11,6 +11,8 @@ async function commonBeforeAll() {
 	await db.query('DELETE FROM movie');
 	// noinspection SqlWithoutWhere
 	await db.query('DELETE FROM users');
+	// noinspection SqlWithoutWhere
+	await db.query('DELETE FROM user_movie');
 
 	const resultsMovies = await db.query(`
 	      INSERT INTO movie (imdb_id, title, year, genre, plot, director, poster, imdb_rating)
@@ -32,9 +34,8 @@ async function commonBeforeAll() {
 	testUserIds.splice(0, 0, ...resultsUsers.rows.map((r) => r.id));
 
 	await db.query(
-		`
-	      INSERT INTO user_movie (user_id, movie_id, viewed)
-	      VALUES ($1, $2, TRUE)`,
+		`INSERT INTO user_movie (user_id, movie_id, viewed)
+	      VALUES ($1, $2, TRUE) RETURNING id, user_id, movie_id, viewed`,
 		[ testUserIds[0], testMovieIds[0] ]
 	);
 }

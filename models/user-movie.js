@@ -130,13 +130,13 @@ class UserMovie {
 	}
 
 	static async getViewedByImdbId(userId, movieId) {
-		console.log('printing from user-movie ln 133: ', userId, movieId);
 		const viewedRes = await db.query(
 			`SELECT m.imdb_id, um.movie_id, um.viewed FROM movie m INNER JOIN user_movie AS um ON um.movie_id = m.id WHERE m.imdb_id IN ($1) AND um.user_id = $2`,
 			[ movieId, userId ]
 		);
 
 		const [ viewedMovies ] = viewedRes.rows;
+
 		return viewedMovies;
 	}
 }

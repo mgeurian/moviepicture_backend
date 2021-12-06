@@ -1,7 +1,7 @@
 'use strict';
 
 const db = require('../db.js');
-const Movie = require('./user-movie');
+const Movie = require('./movie');
 const { commonBeforeAll, commonBeforeEach, commonAfterEach, commonAfterAll, testMovieIds } = require('./_testCommon');
 
 beforeAll(commonBeforeAll);
@@ -25,7 +25,7 @@ describe('create', function() {
 		imdbRating: 7.0
 	};
 
-	test('create new movie works', async function() {
+	test('new movie works', async function() {
 		await Movie.create(newMovie);
 
 		const result = await db.query(
